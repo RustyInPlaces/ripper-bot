@@ -37,7 +37,8 @@ if config['rip']['steamids_uri']:
     res = requests.get(uri)
     steam64ids = []
     for line in res.iter_lines():
-        steam64ids.append(line.strip())
+        steam64ids.append(line.decode('utf-8').strip())
+        print(steam64ids)
     print('Retrieved SteamID64s from ' + uri)
 else:
     with open('./steam64ids.json') as f:

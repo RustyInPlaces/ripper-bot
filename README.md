@@ -1,6 +1,6 @@
 # RIPper bot
 
-## Configuration
+## Setup
 
 1. Create a virtual environment 'env'
 
@@ -13,6 +13,16 @@
 3. install python requirements
 
 > pip install -r requirements.txt
+
+## Configuration
+
+The bot can be configured either by setting environment variables or using a lcoal `config.json` file. For the local json configuration, please refer to `config.example.json`.
+
+Following environment variables could be set:
+- BM_SERVER_TOKEN: the token secret with admin privileges on Battlemetrics
+- BM_SERVER_ID: the Battlemetrics ID given to the server to watch
+- DISCORD_TOKEN: the discord token to identify with the discord bot
+- RIP_STEAMIDS_URI: the link to the text file containing all Steam IDs of RIP members
 
 ## Operation
 

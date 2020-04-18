@@ -1,5 +1,8 @@
 {
     "token": "<YOUR DISCORD BOT TOKEN>",
+    "rip": {
+        "steamids_uri": "<URI TO FILE CONTAINING STEAMID64s on each line of data>"
+    },
     "battlemetrics": {
         "token": "<YOUR BATTLEMETRICS API TOKEN>",
         "server": 537720 

@@ -1,26 +1,61 @@
 import json
+import os
 from datetime import datetime
 import discord
+import requests
 
 from battlemetrics import BattleMetrics
 
-with open('./config.json', 'r') as f:
-    config = json.load(f)
+#
+# Config Retrieval
+#
 
-with open('./steam64ids.json') as f:
-    steam64ids = json.load(f)
+config = {}
+config['token'] = os.environ.get('DISCORD_TOKEN')
+config['battlemetrics'] = {
+    'token': os.environ.get('BM_SERVER_TOKEN'),
+    'server': os.environ.get('BM_SERVER_ID')
+}
+config['rip'] = {
+    'steamids_uri': os.environ.get('RIP_STEAMIDS_URI')
+}
 
-print(steam64ids)
+# local config.json take precedence over set environment variables.
+try:
+    with open('./config.json', 'r') as f:
+        config_json = json.load(f)
+        config.update(config_json)
+except FileNotFoundError:
+    print('No config.json file found. Falling back to ENV VARs')
 
-bm = BattleMetrics(
-    config['battlemetrics']['token']
-)
+#
+# Fetch steam64ids
+#
+
+if config['rip']['steamids_uri']:
+    uri = config['rip']['steamids_uri']
+    res = requests.get(uri)
+    steam64ids = []
+    for line in res.iter_lines():
+        steam64ids.append(line.strip())
+    print('Retrieved SteamID64s from ' + uri)
+else:
+    with open('./steam64ids.json') as f:
+        steam64ids = json.load(f)
+    print('Retrieved SteamID64s from local file.')
+
+
 
 TEAM_TRANSLATION = {
     1: "left side faction",
     2: "right side faction",
     0: "unassigned"
 }
+
+bm = BattleMetrics(
+    config['battlemetrics']['token']
+)
+
 
 class RIPClient(discord.Client):
 

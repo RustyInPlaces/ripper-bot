@@ -23,6 +23,7 @@ Following environment variables could be set:
 - BM_SERVER_ID: the Battlemetrics ID given to the server to watch
 - DISCORD_TOKEN: the discord token to identify with the discord bot
 - RIP_STEAMIDS_URI: the link to the text file containing all Steam IDs of RIP members
+- RIP_STEAMIDS_UPDATE_HOURS: amount of hours to consider the list of Steam ID's as fresh before performing a new fetch
 
 ## Operation
 

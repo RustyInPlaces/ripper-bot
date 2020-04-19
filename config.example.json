@@ -1,7 +1,8 @@
 {
     "token": "<YOUR DISCORD BOT TOKEN>",
     "rip": {
-        "steamids_uri": "<URI TO FILE CONTAINING STEAMID64s on each line of data>"
+        "steamids_uri": "<URI TO FILE CONTAINING STEAMID64s on each line of data>",
+        "steamids_update_interval": 24
     },
     "battlemetrics": {
         "token": "<YOUR BATTLEMETRICS API TOKEN>",

@@ -31,6 +31,12 @@ class BattleMetrics(object):
         return teams
 
     def get_sessions(self, server_id):
+        """Fetch all player sessions from the server and returns a dictionary
+        of players (keys) and their current session (value).
+        
+        Keyword arguments:
+        server_id -- the battlemetrics ID of the server
+        """
         res = self._perform_request(
             self._build_get_request(
                 "/servers/{0}?include=session".format(server_id)))
@@ -43,6 +49,12 @@ class BattleMetrics(object):
         return player_sessions
 
     def get_identities(self, server_id, identifier_type=None):
+        """Fetch all player identities from the server and returns a dictonary
+        of players (keys) and a list of their identities (value).
+
+        Keyword arguments:
+        server_id -- the battlemetrics ID of the server
+        """
         res = self._perform_request(
             self._build_get_request(
                 "/servers/{0}?include=identifier".format(server_id)))
@@ -55,9 +67,13 @@ class BattleMetrics(object):
 
         return players
 
-    # - Internal Methods
+    #
+    # Request Builders
+    #
 
     def _build_get_request(self, path):
+        """Creates a GET request for the Battlemetrics API. Use relative paths, such as '/players'""" 
+
         uri = "https://api.battlemetrics.com" + path
         bearer_header_content = "Bearer " + self.auth_token
         headers = {

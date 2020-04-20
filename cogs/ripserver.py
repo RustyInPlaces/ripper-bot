@@ -4,7 +4,7 @@ import json
 import requests
 
 from .battlemetrics import BattleMetrics
-from config import config
+from .config import config
 
 class RipServer(BattleMetrics):
 

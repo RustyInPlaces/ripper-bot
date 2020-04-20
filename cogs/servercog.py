@@ -3,7 +3,7 @@ from datetime import datetime
 from discord.ext import commands
 
 from .ripserver import RipServer
-from config import config
+from cogs.config import config
 
 class ServerCog(commands.Cog):
 
@@ -73,6 +73,11 @@ class ServerCog(commands.Cog):
         
         await ctx.channel.send(msg)
 
+    @commands.command(name='update')
+    async def update(self, ctx):
+        print("Received force refresh for steam64ids")
+        self.rip_server.steam64ids_force_update()
+        await ctx.channel.send("Done.")
  
 def setup(bot):
     bot.add_cog(ServerCog(bot))

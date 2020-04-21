@@ -1,5 +1,6 @@
 {
     "token": "<YOUR DISCORD BOT TOKEN>",
+    "bugsnag_token": "<BUGSNAG TOKEN>",
     "rip": {
         "steamids_uri": "<URI TO FILE CONTAINING STEAMID64s on each line of data>",
         "steamids_update_interval": 24

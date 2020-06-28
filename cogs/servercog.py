@@ -39,7 +39,7 @@ class ServerCog(commands.Cog):
         else:
             msg += "*Feel free to join either side.*"
 
-        await ctx.channel.send(msg)
+        await ctx.author.send(msg)
 
     @commands.command(name='online')
     async def online(self, ctx):
@@ -48,7 +48,7 @@ class ServerCog(commands.Cog):
         sessions = self.rip_server.get_sessions(self.config['battlemetrics']['server'])
 
         if not teams:
-            await ctx.channel.send("Server empty.")
+            await ctx.author.send("Server empty.")
             return
 
         msg = "RIP Members online (with join time):\n"
@@ -71,13 +71,13 @@ class ServerCog(commands.Cog):
                     session_datetime.strftime("%H:%M:%S"))
             msg += "\n"
         
-        await ctx.channel.send(msg)
+        await ctx.author.send(msg)
 
     @commands.command(name='update')
     async def update(self, ctx):
         print("Received force refresh for steam64ids")
         self.rip_server.steam64ids_force_update()
-        await ctx.channel.send("Done.")
+        await ctx.author.send("Done.")
  
 def setup(bot):
     bot.add_cog(ServerCog(bot))

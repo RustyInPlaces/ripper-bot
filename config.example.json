@@ -3,7 +3,8 @@
     "bugsnag_token": "<BUGSNAG TOKEN>",
     "rip": {
         "steamids_uri": "<URI TO FILE CONTAINING STEAMID64s on each line of data>",
-        "steamids_update_interval": 24
+        "steamids_update_interval": 24,
+        "announce_balance_issue_discord_channel_id": 1111111111111111111111
     },
     "battlemetrics": {
         "token": "<YOUR BATTLEMETRICS API TOKEN>",

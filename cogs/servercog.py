@@ -1,9 +1,15 @@
-from datetime import datetime
+from datetime import datetime, date
 
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from .ripserver import RipServer
 from cogs.config import config
+
+IMBALANCE_DIFFERENCE_ALLOWED = 3
+MAX_IMBALANCE_REMINDERS = 2
+WAIT_TIME_BETWEEN_REMINDERS = 5
+EARLIEST_ROUND_TIME_FOR_REMINDER = 2
+LATEST_ROUND_TIME_FOR_REMINDER = 10
 
 class ServerCog(commands.Cog):
 
@@ -20,6 +26,12 @@ class ServerCog(commands.Cog):
         self.auth_token = config['token']
         self.rip_server = RipServer(self.config)
 
+        self.previous_map = None
+        self.minutes_since_mapchange = 0
+        self.reminder_sent_at = -10
+        self.reminders_sent = 0
+
+
     @commands.command(name='ripbalance')
     async def ripbalance(self, ctx):
         """Reports the current balance of RIP players per team"""
@@ -30,7 +42,7 @@ class ServerCog(commands.Cog):
         balance_difference = abs(balance_left - balance_right)
 
         msg = "RIP BALANCE: {0} -vs- {1} \n".format(balance_left, balance_right)
-        if balance_difference <= 3:
+        if balance_difference <= IMBALANCE_DIFFERENCE_ALLOWED:
             msg += "*Server is balanced (3 or less difference)*"
         elif balance_left > balance_right:
             msg += "*RIP Imbalance! Please join the faction on the right to ensure RIP members are balanced.*"
@@ -79,8 +91,66 @@ class ServerCog(commands.Cog):
         self.rip_server.steam64ids_force_update()
         await ctx.author.send("Done.")
  
+    @commands.command(name="map")
+    async def map(self, ctx):
+        map = self.rip_server.get_map(config['battlemetrics']['server'])
+        await ctx.author.send(f"Current map: {map}")
+
+    @tasks.loop(minutes=1)
+    async def balance_check(self):
+        print("! balance check")
+        print(f"- minutes since map change: {self.minutes_since_mapchange}")
+        # no warnings on friday
+        if date.today().isoweekday() == 5:
+            return
+        # only allowed to warn imbalances at beginning of round.
+        if self.minutes_since_mapchange > LATEST_ROUND_TIME_FOR_REMINDER:
+            return
+        if self.minutes_since_mapchange < EARLIEST_ROUND_TIME_FOR_REMINDER:
+            return
+        # do not remind if not enough time has passed
+        if self.minutes_since_mapchange - self.reminder_sent_at < WAIT_TIME_BETWEEN_REMINDERS:
+            return
+        # only allow a max set of reminders
+        if self.reminders_sent > MAX_IMBALANCE_REMINDERS:
+            return
+
+        team_balances = self.rip_server.rip_balance()
+
+        balance_left = team_balances.get(1, 0)
+        balance_right = team_balances.get(2, 0)
+        balance_difference = abs(balance_left - balance_right)
+
+        if balance_difference > IMBALANCE_DIFFERENCE_ALLOWED:  
+            # inacceptable imbalance detected
+            print(f"@here RIP server is imbalanced! ({balance_left}v{balance_right}). Fix it plzkthx.")
+            await self.rip_squad_channel.send(f"@here RIP server is imbalanced! ({balance_left}v{balance_right}). Fix it plzkthx.")
+            self.reminders_sent += 1
+            self.reminder_sent_at = self.minutes_since_mapchange
+
+
+    @tasks.loop(minutes=1)
+    async def update_mapchange(self):
+        current_map = self.rip_server.get_map(config['battlemetrics']['server'])
+        if current_map != self.previous_map:
+            # reset counters
+            self.minutes_since_mapchange = 0
+            self.reminders_sent = 0
+            self.reminder_sent_at = 0
+            self.previous_map = current_map
+        else:
+            self.minutes_since_mapchange += 1
+        
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.rip_squad_channel = self.bot.get_channel(self.config['rip']['announce_balance_issue_discord_channel_id'])
+
+        # start tasks
+        self.balance_check.start()
+        self.update_mapchange.start()
+
+
 def setup(bot):
     bot.add_cog(ServerCog(bot))
-
-
 

@@ -8,7 +8,31 @@ class BattleMetrics(object):
 
     def __init__(self, auth_token):
         self.auth_token = auth_token
+        self.server_state = None
     
+    def get_server_state(self, server_id):
+        """Returns the server state
+        
+        Keyward arguments:
+        server_id -- the battlemetrics ID of the server
+        """
+        res = self._perform_request(
+                self._build_get_request(
+                    "/servers/{0}".format(server_id)))
+        self.server_state = res
+        return self.server_state
+
+    def get_map(self, server_id):
+        """Returns the server state
+        
+        Keyward arguments:
+        server_id -- the battlemetrics ID of the server
+        """
+        state = self.get_server_state(server_id)
+        return state.data.attributes.details.map
+
+
+
     def get_teams(self, server_id):
         """Fetch all players from server and seperate them based on their team.
 

@@ -30,6 +30,20 @@ Following environment variables could be set:
 
 Ensure you have a config.json and steam64ids.json file in the same folder as `bot.py`. Please refer to the respective example files on how to set them up correctly.
 
+## Updating
+
+> su bot
+> cd ~/ripper-bot
+> git pull --rebase
+> screen -rd
+
+kill the active screen via ctrl-c
+start screen again with the updated code
+
+> screen -s ripperbot env/bin/python3 bot.py
+
+push the screen to background via CTRL-A followed with D
+
 ### Manual
 
 You can run the bot manually by running the `bot.py` script within the virtualenv.

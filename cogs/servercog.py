@@ -54,13 +54,16 @@ class ServerCog(commands.Cog):
         await ctx.author.send(msg)
 
     @commands.command(name='online')
-    async def online(self, ctx):
+    async def online(self, ctx=None):
         """Reports which RIP players are on each team, including join time"""
         teams = self.rip_server.get_teams_rip_only()
         sessions = self.rip_server.get_sessions(self.config['battlemetrics']['server'])
 
         if not teams:
-            await ctx.author.send("Server empty.")
+            if ctx:
+                await ctx.author.send("Server empty.")
+            else:
+                await self.rip_squad_channel.send("Server empty.")
             return
 
         msg = "RIP Members online (with join time):\n"
@@ -83,7 +86,10 @@ class ServerCog(commands.Cog):
                     session_datetime.strftime("%H:%M:%S"))
             msg += "\n"
         
-        await ctx.author.send(msg)
+        if ctx:
+            await ctx.author.send(msg)
+        else:
+            await self.rip_squad_channel.send(msg)
 
     @commands.command(name='update')
     async def update(self, ctx):
@@ -125,6 +131,7 @@ class ServerCog(commands.Cog):
             # inacceptable imbalance detected
             print(f"@here RIP server is imbalanced! ({balance_left}v{balance_right}). Fix it plzkthx.")
             await self.rip_squad_channel.send(f"@here RIP server is imbalanced! ({balance_left}v{balance_right}). Fix it plzkthx.")
+            await self.online()
             self.reminders_sent += 1
             self.reminder_sent_at = self.minutes_since_mapchange
 
